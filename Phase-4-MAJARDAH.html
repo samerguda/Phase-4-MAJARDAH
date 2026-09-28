@@ -1,364 +1,377 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNITÉ 8: Il y a un problème ?</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Tajawal & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #fff4f4;
+            --main-node-bg: #ffccc7;
+            --main-node-border: #ff7875;
+            --sub-node-bg: #ffe8e8;
+            --sub-node-border: #ffa39e;
+            --leaf-node-bg: #ffffff;
+            --leaf-node-border: #ffbb86;
+            --line-color: #f5222d;
+            --text-dark: #262626;
+            --primary-blue: #1890ff;
+            --success-green: #52c41a;
+        }
 
+        body {
+            font-family: 'Tajawal', 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+        }
 
-<title>Phase 4 MAJARDAH</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        .tree, .tree ul, .tree li {
+            position: relative;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
 
+        .tree {
+            direction: ltr; /* Keeps mindmap structure oriented left-to-right */
+        }
 
+        .tree ul {
+            padding-left: 35px;
+        }
 
-<body>
+        .tree li {
+            margin: 14px 0;
+            position: relative;
+        }
 
+        /* Connecting lines logic */
+        .tree li::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -20px;
+            width: 2px;
+            background-color: var(--line-color);
+        }
 
-  <!-- =================================================== -->
-<!-- =================================================== -->
-<div class="w3-container w3-teal">
-  <h1>Phase 4 MAJARDAH CIVIL</h1>
-</div>
+        .tree li:last-child::before {
+            height: 25px;
+        }
 
+        .tree li::after {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: -20px;
+            width: 20px;
+            height: 2px;
+            background-color: var(--line-color);
+        }
 
-<!-- =================================================== -->
-<!-- =================================================== -->
-<!-- =================================================== -->
-<!-- =================================================== -->
-<!-- =================================================== -->
-<!-- =================================================== -->
-<!-- =================================================== -->
-<!-- =================================================== -->
+        .tree > ul > li::before,
+        .tree > ul > li::after {
+            display: none;
+        }
 
-<div class="w3-row-padding w3-margin-top">
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="1.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
+        .node {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            border-radius: 9999px;
+            background-color: var(--sub-node-bg);
+            border: 2px solid var(--sub-node-border);
+            box-shadow: 0 2px 8px rgba(245, 34, 45, 0.08);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 100%;
+        }
+
+        .node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(245, 34, 45, 0.15);
+        }
+
+        .node-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f1f1f;
+        }
+
+        .node-arabic {
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            color: #a8071a;
+            background-color: #fff1f0;
+            padding: 3px 12px;
+            border-radius: 16px;
+            border: 1px solid #ffa39e;
+            direction: rtl;
+            font-size: 15px;
+        }
+
+        .main-title {
+            background-color: var(--main-node-bg);
+            border-color: var(--main-node-border);
+            font-size: 18px;
+            padding: 14px 28px;
+        }
+
+        .btn-copy {
+            background: #ffffff;
+            border: 1px solid #d9d9d9;
+            color: #595959;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-copy:hover {
+            color: #f5222d;
+            border-color: #ff4d4f;
+            background-color: #fff1f0;
+        }
+
+        .btn-copy.copied {
+            background-color: var(--success-green);
+            border-color: var(--success-green);
+            color: #ffffff;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1f1f1f;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 min-h-screen flex flex-col items-center justify-start">
+
+    <header class="text-center mb-8">
+        <div class="inline-flex items-center gap-2 bg-red-100 text-red-700 px-4 py-1.5 rounded-full text-sm font-semibold mb-3">
+            <i class="fa-solid fa-sitemap"></i>
+            <span>الخريطة الذهنية التفاعلية</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">UNITÉ 8: Il y a un problème ?</h1>
+        <p class="text-gray-500 text-sm sm:text-base">انقر على أيقونة النسخ المجاورة للعنوان لنسخ النص الفرنسي مباشرة</p>
+    </header>
+
+    <div class="container max-w-4xl w-full bg-white p-6 sm:p-10 rounded-2xl shadow-xl border border-red-100">
+        <div class="tree">
+            <ul>
+                <li>
+                    <!-- Main Root Title -->
+                    <div class="node main-title">
+                        <span class="node-text font-bold text-red-950">UNITÉ 8: Il y a un problème ?</span>
+                        <button class="btn-copy" onclick="copyText(this, 'UNITÉ 8: Il y a un problème ?')" title="نسخ النص الفرنسي">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+
+                    <ul>
+                        <!-- Branch 1: Grammaire -->
+                        <li>
+                            <div class="node">
+                                <span class="node-arabic">جرامر</span>
+                            </div>
+                            <ul>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">L'impératif</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'L\'impératif')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">Les pronoms relatifs qui et que</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'Les pronoms relatifs qui et que')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">Les pronoms démonstratif</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'Les pronoms démonstratif')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">La place des adjectifs</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'La place des adjectifs')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- Branch 2: Vocabulaire -->
+                        <li>
+                            <div class="node">
+                                <span class="node-arabic">فوكاب CMRP</span>
+                            </div>
+                            <ul>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">Les parties du corps</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'Les parties du corps')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">Chez le médecin</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'Chez le médecin')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">Les réseaux sociaux et le téléphone</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'Les réseaux sociaux et le téléphone')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">Pendant et depuis</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'Pendant et depuis')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- Branch 3: Questions -->
+                        <li>
+                            <div class="node">
+                                <span class="node-arabic">الأسئلة</span>
+                            </div>
+                        </li>
+
+                        <!-- Branch 4: Summary / Communication -->
+                        <li>
+                            <div class="node">
+                                <span class="node-arabic">الملخص</span>
+                            </div>
+                            <ul>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">Exposer un problème</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'Exposer un problème')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">Dire ce qui ne va pas</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'Dire ce qui ne va pas')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">Donner son opinion</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'Donner son opinion')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">Exprimer l'accord et le désaccord</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'Exprimer l\'accord et le désaccord')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="node">
+                                        <span class="node-text">Inviter</span>
+                                        <button class="btn-copy" onclick="copyText(this, 'Inviter')" title="نسخ"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
     </div>
-  </div>
 
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="2.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
+    <!-- Toast Popup Notification -->
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span>تم نسخ النص بنجاح!</span>
     </div>
-  </div>
 
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="3.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-</div>
+    <script>
+        function copyText(btn, text) {
+            // Helper function using execCommand fallback for cross-browser / iframe support
+            function fallbackCopyTextToClipboard(textToCopy) {
+                const textArea = document.createElement("textarea");
+                textArea.value = textToCopy;
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showSuccess();
+                } catch (err) {
+                    console.error('فشل عملية النسخ: ', err);
+                }
+                document.body.removeChild(textArea);
+            }
 
+            function showSuccess() {
+                const icon = btn.querySelector('i');
+                const originalClass = icon.className;
+                
+                icon.className = 'fa-solid fa-check';
+                btn.classList.add('copied');
 
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
 
+                setTimeout(() => {
+                    icon.className = originalClass;
+                    btn.classList.remove('copied');
+                    toast.classList.remove('show');
+                }, 1800);
+            }
 
-<!-- =================================================== -->
-
-<div class="w3-row-padding w3-margin-top">
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="4.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="5.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="6.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- =================================================== -->
-
-<div class="w3-row-padding w3-margin-top">
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="7.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="8.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="9.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- =================================================== -->
-
-<div class="w3-row-padding w3-margin-top">
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="10.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="11.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="12.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- =================================================== -->
-
-<div class="w3-row-padding w3-margin-top">
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="13.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="14.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="15.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- =================================================== -->
-
-<div class="w3-row-padding w3-margin-top">
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="16.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="17.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="18.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- =================================================== -->
-
-<div class="w3-row-padding w3-margin-top">
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="19.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="20.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="21.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- =================================================== -->
-
-<div class="w3-row-padding w3-margin-top">
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="22.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="23.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="24.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- =================================================== -->
-
-<div class="w3-row-padding w3-margin-top">
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="25.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="26.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="27.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- =================================================== -->
-
-<div class="w3-row-padding w3-margin-top">
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="28.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="29.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-third">
-    <div class="w3-card">
-      <img src="30.jpeg" style="width:100%">
-      <div class="w3-container">
-        <h5> </h5>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-  <!-- ================ -->
-  <!-- ================ -->
-  <!-- ================ -->
-  <!-- ================ -->
-  <!-- ================ -->
-  <!-- ================ -->
-  <!-- ================ -->
-  
-
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(showSuccess).catch(() => {
+                    fallbackCopyTextToClipboard(text);
+                });
+            } else {
+                fallbackCopyTextToClipboard(text);
+            }
+        }
+    </script>
 </body>
 </html>
